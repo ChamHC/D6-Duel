@@ -9,14 +9,14 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: c850ee8c3b14cc8459e7e186857cf567
   - enabled: 1
-    path: Assets/Scenes/Campaign.unity
-    guid: f27d4830595f3b64db90af27aaf9379e
-  - enabled: 1
     path: Assets/Scenes/Endless.unity
     guid: 1e3c007e861c1324197ddb7a823246df
   - enabled: 1
     path: Assets/Scenes/Duel.unity
     guid: e07c8d1844d32fc43a51d1453fab75d5
+  - enabled: 1
+    path: Assets/Scenes/Level 1.unity
+    guid: f27d4830595f3b64db90af27aaf9379e
   m_configObjects:
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000,
       guid: 4e4e5ddb19c38e94e8e5d22ee0c44fbf, type: 2}
