@@ -7,9 +7,9 @@ public class EnemyAIController : MonoBehaviour
     private UtilityManager turn;
 
     [Header("Launching Parameters")]
-    [SerializeField] private float timerThreshold = 1f;
+    [SerializeField] public float timerThreshold = 2f;
     [SerializeField, ReadOnly] private Vector3 launchDirection;
-    [SerializeField, ReadOnly] private float timer;
+    [SerializeField, ReadOnly] public float timer;
     [SerializeField, ReadOnly] public int diceValue;
     [SerializeField, ReadOnly] public bool isStationary;
     [SerializeField, ReadOnly] public bool isLaunched;
@@ -37,7 +37,8 @@ public class EnemyAIController : MonoBehaviour
 
     private void AIAction()
     {
-        timer += Time.deltaTime;
+        if (!turn.isPlayerTurn)
+            timer += Time.deltaTime;
 
         if (timer > timerThreshold)
         {

@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,6 +8,7 @@ public class UtilityManager : MonoBehaviour
     [SerializeField] private DiceController player;
     [SerializeField] private GameObject victoryObject;
     [SerializeField] private GameObject defeatObject;
+    [SerializeField] private TextMeshProUGUI turnText;
     private EnemyAIController[] enemies;
     public bool isPlayerTurn = true;
 
@@ -16,11 +18,13 @@ public class UtilityManager : MonoBehaviour
         StartCoroutine(TurnLoop());
         victoryObject.SetActive(false);
         defeatObject.SetActive(false);
+        turnText.enabled = false;
     }
 
     private void Update()
     {
         LevelEndHandler();
+        TurnTextHandler();
     }
 
     private void AssignGameObjects()
@@ -98,7 +102,7 @@ public class UtilityManager : MonoBehaviour
         {
             if (enemy.gameObject.activeSelf)
             {
-                if (enemy == null || enemy.isStationary || !enemy.isLaunched)
+                if (enemy == null || !enemy.isStationary || !enemy.isLaunched)
                 {
                     allEnemyLaunched = false;
                     break;
@@ -140,5 +144,34 @@ public class UtilityManager : MonoBehaviour
     public void QuitHandler()
     {
         SceneManager.LoadScene(0);
+    }
+
+    public void TurnTextHandler()
+    {
+        if (isPlayerTurn)
+        {
+            turnText.SetText("Player's Turn");
+            if (player.timer > player.timerThreshold/2 && player.timer < player.timerThreshold)
+            {
+                turnText.enabled = true;
+            }
+            else
+            {
+                turnText.enabled = false;
+            }
+        }
+        else
+        {
+            turnText.SetText("Opponent's Turn");
+            if (enemies[0].timer > enemies[0].timerThreshold/2 && enemies[0].timer < enemies[0].timerThreshold)
+            {
+                turnText.enabled = true;
+            }
+            else
+            {
+                turnText.enabled = false;
+            }
+        }
+ 
     }
 }

@@ -9,11 +9,11 @@ public class DiceController : MonoBehaviour
     private UtilityManager turn;
 
     [Header("Launching Parameters")]
-    [SerializeField] private float timerThreshold = 1f;
+    [SerializeField] public float timerThreshold = 2f;
     [SerializeField, ReadOnly] private Vector3 dragStartPosition;
     [SerializeField, ReadOnly] private Vector3 dragEndPosition;
     [SerializeField, ReadOnly] private Vector3 launchDirection;
-    [SerializeField, ReadOnly] private float timer;
+    [SerializeField, ReadOnly] public float timer;
     [SerializeField, ReadOnly] private bool isOnDice;
     [SerializeField, ReadOnly] private bool dragStart;
     [SerializeField, ReadOnly] private bool dragging;
