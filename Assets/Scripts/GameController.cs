@@ -20,15 +20,18 @@ public enum GameState
     Defeat
 }
 
-public class TurnController : MonoBehaviour
+public class GameController : MonoBehaviour
 {
     [ReadOnly] public GameState state;
     [Header("Assigned Objects")]
     public List<GameObject> players;
     public List<GameObject> opponents;
+    public List<GameObject> abilities;
     public TextMeshProUGUI turnText;
     public Material playerMaterial;
     public Material altPlayerMaterial;
+    public GameObject victoryUI;
+    public GameObject defeatUI;
     private bool isCoroutineRunning;
 
     [Header("Dice Parameters")]
@@ -38,8 +41,11 @@ public class TurnController : MonoBehaviour
     [Header("Drag Parameters")]
     [ReadOnly] public bool isOnDice;
 
-    [Header("AI Parameters")]
+    [Header("AI Parameters (Sum = 1)")]
     [SerializeField, Range(0, 1)] public float attackChance;
+    [SerializeField, Range(0, 1)] public float wanderChance;
+    [SerializeField, Range(0, 1)] public float abilityChance;
+    [ReadOnly] public float sumOfChance;
 
 
 
@@ -47,7 +53,6 @@ public class TurnController : MonoBehaviour
     {
         state = GameState.Start;
 
-        Setup();
         StartCoroutine(TurnHandler());
     }
 
@@ -58,6 +63,8 @@ public class TurnController : MonoBehaviour
             PlayerAction();
             OpponentAction();
         }
+        if (state != GameState.Start)
+            CheckGameState();
     }
 
     public void Setup()
@@ -74,6 +81,13 @@ public class TurnController : MonoBehaviour
         foreach (var opponent in opponentGameObjects)
         {
             opponents.Add(opponent);
+        }
+
+        abilities = new List<GameObject>();
+        GameObject[] abilityGameObjects = GameObject.FindGameObjectsWithTag("PowerUps");
+        foreach (var ability in abilityGameObjects)
+        {
+            abilities.Add(ability);
         }
 
         altPlayerMaterial.SetFloat("_Glossiness", 1f);
@@ -126,68 +140,6 @@ public class TurnController : MonoBehaviour
         isCoroutineRunning = false;
         //Debug.Log("Coroutine Ended");
     }
-    /*
-        public void PlayerAction()
-        {
-            if (state != GameState.PlayerTurn)
-                return;
-
-            bool allPlayersLaunched = false;
-            foreach (var player in players)
-            {
-                if (!player.GetComponent<UnitObject>().isAimed)
-                {
-                    OnDiceHandler(player.gameObject);
-                    DiceValueRecognizer(player.gameObject);
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        player.GetComponent<UnitObject>().startPosition.x = Input.mousePosition.x;
-                        player.GetComponent<UnitObject>().startPosition.z = Input.mousePosition.y;
-                        //Debug.Log("Clicked");
-                    }
-                    else if (Input.GetMouseButton(0))
-                    {
-                        player.GetComponent<UnitObject>().endPosition.x = Input.mousePosition.x;
-                        player.GetComponent<UnitObject>().endPosition.z = Input.mousePosition.y;
-                        player.GetComponent<UnitObject>().launchDirection = -Vector3.Normalize(player.GetComponent<UnitObject>().endPosition - player.GetComponent<UnitObject>().startPosition);
-
-                        player.GetComponent<LineRenderer>().enabled = true;
-                        player.GetComponent<LineRenderer>().SetPosition(0, player.transform.position);
-                        player.GetComponent<LineRenderer>().SetPosition(1, player.transform.position + player.GetComponent<UnitObject>().launchDirection * (float)diceValue);
-                        //Debug.Log("Dragged");
-                    }
-                    else if (Input.GetMouseButtonUp(0))
-                    {
-                        player.GetComponent<LineRenderer>().enabled = false;
-                        player.GetComponent<UnitObject>().isAimed = true;
-                        isOnDice = false;
-                        //Debug.Log("Released");
-                    }
-                    allPlayersLaunched = players.All(player => player.GetComponent<UnitObject>().isAimed);
-                }
-            }
-
-            if (allPlayersLaunched)
-            {
-                foreach (var player in players)
-                {
-                    //Debug.Log("Launched");
-                    player.GetComponent<Rigidbody>().AddForce(player.GetComponent<UnitObject>().launchDirection * (float)diceValue * 0.5f, ForceMode.Impulse);
-                    player.GetComponent<Rigidbody>().AddForce(Vector3.up * 25f, ForceMode.Impulse);
-
-                    Vector3 torque = Vector3.Cross(player.GetComponent<UnitObject>().launchDirection, Vector3.up);
-                    player.GetComponent<Rigidbody>().AddTorque(torque * 10f, ForceMode.Impulse);
-                    player.GetComponent<Rigidbody>().angularVelocity = new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), Random.Range(-10f, 10f));
-
-                    player.GetComponent<UnitObject>().isAimed = false;
-                    Debug.Log(player.gameObject.name + " Value: " + diceValue);
-                }
-
-                if(!isCoroutineRunning)
-                    StartCoroutine(TurnHandler());
-            }
-        }
-    */
 
     public void PlayerAction()
     {
@@ -266,15 +218,21 @@ public class TurnController : MonoBehaviour
             if (!opponent.GetComponent<UnitObject>().isAimed)
             {
                 DiceValueRecognizer(opponent);
-                if (Random.value < attackChance)
+                float randomValue = Random.value;
+                if (randomValue < attackChance)
                 {
                     Vector3 playerDirection = players[Random.Range(0, players.Count)].transform.position - opponent.transform.position;
                     opponent.GetComponent<UnitObject>().launchDirection = Vector3.Normalize(playerDirection);
                 }
-                else
+                else if (randomValue < attackChance + wanderChance)
                 {
                     Vector3 randomDirection = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f)).normalized;
                     opponent.GetComponent<UnitObject>().launchDirection = randomDirection;
+                }
+                else
+                {
+                    Vector3 abilityDirection = abilities[Random.Range(0, abilities.Count)].transform.position - opponent.transform.position;
+                    opponent.GetComponent<UnitObject>().launchDirection = Vector3.Normalize(abilityDirection);
                 }
                 opponent.GetComponent<UnitObject>().isAimed = true;
 
@@ -320,6 +278,22 @@ public class TurnController : MonoBehaviour
             player.GetComponent<UnitObject>().timer = 0f; // Reset timer
         }
         player.GetComponent<UnitObject>().timer += Time.deltaTime;
+    }
+
+    public void CheckGameState()
+    {
+        if (players.Count == 0)
+        {
+            state = GameState.Defeat;
+            defeatUI.SetActive(true);
+            turnText.enabled = false;
+        }
+        else if (opponents.Count == 0)
+        {
+            state = GameState.Victory;
+            victoryUI.SetActive(true);
+            turnText.enabled = false;
+        }
     }
 
     //Utility
@@ -382,5 +356,10 @@ public class TurnController : MonoBehaviour
         }
         dice.GetComponent<UnitObject>().diceValue = closestFace;
         dice.GetComponent<UnitObject>().diceValue = closestFace;
+    }
+
+    public void OnValidate()
+    {
+        sumOfChance = wanderChance + attackChance + abilityChance;
     }
 }

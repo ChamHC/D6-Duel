@@ -7,7 +7,11 @@ using UnityEngine.SceneManagement;
 
 public class MenuController : MonoBehaviour
 {
-    public void PlayLevelOne()
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene(0);
+    }
+    public void LoadLevelOne()
     {
         SceneManager.LoadScene(1);
     }
