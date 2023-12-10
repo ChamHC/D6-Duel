@@ -9,7 +9,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 public enum GameState
 {
@@ -29,9 +28,14 @@ public class GameController : MonoBehaviour
     public List<GameObject> abilities;
     public TextMeshProUGUI turnText;
     public Material playerMaterial;
+    public Material gobletPlayerMaterial;
     public Material altPlayerMaterial;
+    public Material altGobletPlayerMaterial;
+    public Material gobletOpponentMaterial;
     public GameObject victoryUI;
     public GameObject defeatUI;
+    public PowerUps playerAbilityManager;
+    public PowerUps opponentAbilityManager;
     private bool isCoroutineRunning;
 
     [Header("Dice Parameters")]
@@ -91,6 +95,7 @@ public class GameController : MonoBehaviour
         }
 
         altPlayerMaterial.SetFloat("_Glossiness", 1f);
+        altGobletPlayerMaterial.SetFloat("_Glossiness", 1f);
     }
 
     IEnumerator TurnHandler()
@@ -98,14 +103,29 @@ public class GameController : MonoBehaviour
         //Debug.Log("Coroutine Started");
         isCoroutineRunning = true;
         yield return new WaitUntil(() => AllStationary());
-        if (state == GameState.OpponentTurn || state == GameState.Start)
+        if ((state == GameState.OpponentTurn || state == GameState.Start) && !opponents[0].GetComponent<UnitObject>().anchorAbility)
         {
+            playerAbilityManager.gameObject.GetComponent<Button>().interactable = true;
             turnText.text = "Player's\nTurn";
         }
-        else if (state == GameState.PlayerTurn)
+        else if (state == GameState.PlayerTurn && !players[0].GetComponent<UnitObject>().anchorAbility)
         {
             yield return new WaitForSeconds(1f);
             turnText.text = "Opponent's\nTurn";
+        }
+
+        //Reset
+        foreach (var player in players)
+        {
+            player.transform.localScale = new (50f, 50f, 50f);
+            player.GetComponent<UnitObject>().crossAbility = false;
+            player.GetComponent<UnitObject>().sunAbility = false;
+        }
+        foreach (var opponent in opponents)
+        {
+            opponent.transform.localScale = new(50f, 50f, 50f);
+            opponent.GetComponent<UnitObject>().crossAbility = false;
+            opponent.GetComponent<UnitObject>().sunAbility = false;
         }
 
         var color = turnText.color;
@@ -128,7 +148,23 @@ public class GameController : MonoBehaviour
             yield return null;
         }
 
-        if (state == GameState.OpponentTurn || state == GameState.Start)
+        if (players[0].GetComponent<UnitObject>().anchorAbility)
+        {
+            state = GameState.PlayerTurn;
+            foreach (var player in players)
+            {
+                player.GetComponent<UnitObject>().anchorAbility = false;
+            }
+        }
+        else if (opponents[0].GetComponent<UnitObject>().anchorAbility)
+        {
+            state = GameState.OpponentTurn;
+            foreach (var opponent in opponents)
+            {
+                opponent.GetComponent<UnitObject>().anchorAbility = false;
+            }
+        }
+        else if (state == GameState.OpponentTurn || state == GameState.Start)
         {
             state = GameState.PlayerTurn;
         }
@@ -155,7 +191,6 @@ public class GameController : MonoBehaviour
                 OnDiceHandler(player.gameObject);
                 if (isOnDice)
                 {
-                    DiceValueRecognizer(selectedDice.gameObject);
                     if (Input.GetMouseButtonDown(0))
                     {
                         selectedDice.GetComponent<UnitObject>().startPosition.x = Input.mousePosition.x;
@@ -170,15 +205,43 @@ public class GameController : MonoBehaviour
 
                         selectedDice.GetComponent<LineRenderer>().enabled = true;
                         selectedDice.GetComponent<LineRenderer>().SetPosition(0, selectedDice.transform.position);
-                        selectedDice.GetComponent<LineRenderer>().SetPosition(1, selectedDice.transform.position + selectedDice.GetComponent<UnitObject>().launchDirection * (float)selectedDice.GetComponent<UnitObject>().diceValue);
+
+                        if (!selectedDice.GetComponent<UnitObject>().eagleAbility)
+                        {
+                            DiceValueRecognizer(selectedDice.gameObject);
+                            selectedDice.GetComponent<LineRenderer>().SetPosition(1, selectedDice.transform.position + selectedDice.GetComponent<UnitObject>().launchDirection * (float)selectedDice.GetComponent<UnitObject>().diceValue);
+                        }
+                        else
+                        {
+                            float distance = Vector3.Distance(selectedDice.GetComponent<UnitObject>().startPosition, selectedDice.GetComponent<UnitObject>().endPosition);
+                            float normalizedDistance;
+                            float launchDistance;
+                            if (!selectedDice.GetComponent<UnitObject>().gobletAbility)
+                            {
+                                normalizedDistance = Mathf.Clamp01(distance / 75.0f);
+                                launchDistance = normalizedDistance * 6f;
+                            }
+                            else
+                            {
+                                normalizedDistance = Mathf.Clamp01(distance / 100.0f);
+                                launchDistance = normalizedDistance * 8f;
+                            }
+                            selectedDice.GetComponent<LineRenderer>().SetPosition(1, selectedDice.transform.position + selectedDice.GetComponent<UnitObject>().launchDirection * launchDistance);
+                            selectedDice.GetComponent<UnitObject>().diceValue = launchDistance;
+                        }
                         //Debug.Log("Dragged");
                     }
                     else if (Input.GetMouseButtonUp(0))
                     {
-                        selectedDice.GetComponent<MeshRenderer>().material = playerMaterial;
+                        if (!selectedDice.GetComponent<UnitObject>().gobletAbility)
+                            selectedDice.GetComponent<MeshRenderer>().material = playerMaterial;
+                        else
+                            selectedDice.GetComponent<MeshRenderer>().material = gobletPlayerMaterial;
+
                         selectedDice.GetComponent<LineRenderer>().enabled = false;
                         selectedDice.GetComponent<UnitObject>().isAimed = true;
                         isOnDice = false;
+                        playerAbilityManager.gameObject.GetComponent<Button>().interactable = false;
                         //Debug.Log("Released");
                     }
                 }
@@ -200,8 +263,11 @@ public class GameController : MonoBehaviour
 
                 player.GetComponent<UnitObject>().isAimed = false;
                 Debug.Log(player.gameObject.name + " Value: " + player.GetComponent<UnitObject>().diceValue);
+                player.GetComponent<UnitObject>().isSnowflake = false;
+                player.GetComponent<UnitObject>().eagleAbility = false;
             }
             altPlayerMaterial.SetFloat("_Glossiness", 1.0f);
+            altGobletPlayerMaterial.SetFloat("_Glossiness", 1.0f);
 
             if (!isCoroutineRunning)
                 StartCoroutine(TurnHandler());
@@ -213,6 +279,10 @@ public class GameController : MonoBehaviour
             return;
 
         bool allOpponentsLaunched = false;
+
+        if (opponentAbilityManager.ability != Abilities.Empty)
+            opponentAbilityManager.OpponentCast();
+
         foreach (var opponent in opponents)
         {
             if (!opponent.GetComponent<UnitObject>().isAimed)
@@ -254,6 +324,7 @@ public class GameController : MonoBehaviour
 
                 opponent.GetComponent<UnitObject>().isAimed = false;
                 Debug.Log(opponent.gameObject.name + " Value: " + opponent.GetComponent<UnitObject>().diceValue);
+                opponent.GetComponent<UnitObject>().isSnowflake = false;
             }
 
             if (!isCoroutineRunning)
@@ -263,18 +334,25 @@ public class GameController : MonoBehaviour
 
     public void DicePulser(GameObject player)
     {
-        player.GetComponent<MeshRenderer>().material = altPlayerMaterial;
+        if (!player.GetComponent<UnitObject>().gobletAbility)
+            player.GetComponent<MeshRenderer>().material = altPlayerMaterial;
+        else
+            player.GetComponent<MeshRenderer>().material = altGobletPlayerMaterial;
+
         if (player.GetComponent<UnitObject>().timer <= 2f)
         {
             altPlayerMaterial.SetFloat("_Glossiness", Mathf.Lerp(1f, 0.5f, player.GetComponent<UnitObject>().timer / 2f));
+            altGobletPlayerMaterial.SetFloat("_Glossiness", Mathf.Lerp(1f, 0.5f, player.GetComponent<UnitObject>().timer / 2f));
         }
         else if (player.GetComponent<UnitObject>().timer <= 4f)
         {
             altPlayerMaterial.SetFloat("_Glossiness", Mathf.Lerp(0.5f, 1f, (player.GetComponent<UnitObject>().timer - 2f) / 2f));
+            altGobletPlayerMaterial.SetFloat("_Glossiness", Mathf.Lerp(0.5f, 1f, (player.GetComponent<UnitObject>().timer - 2f) / 2f));
         }
         else
         {
             altPlayerMaterial.SetFloat("_Glossiness", 1f);
+            altGobletPlayerMaterial.SetFloat("_Glossiness", 1f);
             player.GetComponent<UnitObject>().timer = 0f; // Reset timer
         }
         player.GetComponent<UnitObject>().timer += Time.deltaTime;
@@ -297,7 +375,7 @@ public class GameController : MonoBehaviour
     }
 
     //Utility
-    private bool AllStationary()
+    public bool AllStationary()
     {
         bool isStationary = true;
         if (players != null)
@@ -355,7 +433,16 @@ public class GameController : MonoBehaviour
             }
         }
         dice.GetComponent<UnitObject>().diceValue = closestFace;
-        dice.GetComponent<UnitObject>().diceValue = closestFace;
+
+        //Abilites
+        if (dice.transform.localScale.x > 50)
+            dice.GetComponent<UnitObject>().diceValue *= 2f;
+        if (dice.GetComponent<UnitObject>().isSnowflake)
+            dice.GetComponent<UnitObject>().diceValue *= 0.5f;
+        if (dice.GetComponent<UnitObject>().crossAbility)
+            dice.GetComponent<UnitObject>().diceValue *= 3.0f;
+        if (dice.GetComponent<UnitObject>().gobletAbility)
+            dice.GetComponent<UnitObject>().diceValue += 2.0f;
     }
 
     public void OnValidate()

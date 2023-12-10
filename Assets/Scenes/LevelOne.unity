@@ -317,7 +317,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1443037d7267d1942be1ff8f0ec5039b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameController: {fileID: 0}
+  gameController: {fileID: 240346321}
   abilityText: {fileID: 1965634110}
   ability: 0
 --- !u!114 &205514408
@@ -624,9 +624,14 @@ MonoBehaviour:
   abilities: []
   turnText: {fileID: 534207031}
   playerMaterial: {fileID: 2100000, guid: 1e4173d0bc0e0944fb8316bf90420e0c, type: 2}
+  gobletPlayerMaterial: {fileID: 2100000, guid: 8e8f9438c30ea8441aac690deeba5489, type: 2}
   altPlayerMaterial: {fileID: 2100000, guid: 336ad08d84d5e9c4a88fe2fb568d33e7, type: 2}
+  altGobletPlayerMaterial: {fileID: 2100000, guid: aec29076c6f7b7f4c884b8ba48f54334, type: 2}
+  gobletOpponentMaterial: {fileID: 2100000, guid: 62670120156d15046b134e40d0596854, type: 2}
   victoryUI: {fileID: 544531622}
   defeatUI: {fileID: 1303539976}
+  playerAbilityManager: {fileID: 1806603068}
+  opponentAbilityManager: {fileID: 205514407}
   selectedDice: {fileID: 0}
   isOnDice: 0
   attackChance: 0.5
@@ -6419,7 +6424,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!64 &1009124969
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -6454,7 +6459,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f6bb9d3921dddb428695ef0a19923af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnController: {fileID: 240346321}
+  gameController: {fileID: 240346321}
   playerAbility: {fileID: 1806603068}
   opponentAbility: {fileID: 205514407}
   isAimed: 0
@@ -6463,6 +6468,13 @@ MonoBehaviour:
   endPosition: {x: 0, y: 0, z: 0}
   launchDirection: {x: 0, y: 0, z: 0}
   timer: 0
+  sunAbility: 0
+  crossAbility: 0
+  crownAbility: 0
+  anchorAbility: 0
+  eagleAbility: 0
+  gobletAbility: 0
+  isSnowflake: 0
 --- !u!1 &1046412223
 GameObject:
   m_ObjectHideFlags: 0
@@ -8289,7 +8301,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!64 &2041516831
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -8324,7 +8336,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f6bb9d3921dddb428695ef0a19923af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnController: {fileID: 240346321}
+  gameController: {fileID: 240346321}
   playerAbility: {fileID: 1806603068}
   opponentAbility: {fileID: 205514407}
   isAimed: 0
@@ -8333,6 +8345,13 @@ MonoBehaviour:
   endPosition: {x: 0, y: 0, z: 0}
   launchDirection: {x: 0, y: 0, z: 0}
   timer: 0
+  sunAbility: 0
+  crossAbility: 0
+  crownAbility: 0
+  anchorAbility: 0
+  eagleAbility: 0
+  gobletAbility: 0
+  isSnowflake: 0
 --- !u!1 &2053960342
 GameObject:
   m_ObjectHideFlags: 0
@@ -8636,7 +8655,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f6bb9d3921dddb428695ef0a19923af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnController: {fileID: 240346321}
+  gameController: {fileID: 240346321}
   playerAbility: {fileID: 1806603068}
   opponentAbility: {fileID: 205514407}
   isAimed: 0
@@ -8645,6 +8664,13 @@ MonoBehaviour:
   endPosition: {x: 0, y: 0, z: 0}
   launchDirection: {x: 0, y: 0, z: 0}
   timer: 0
+  sunAbility: 0
+  crossAbility: 0
+  crownAbility: 0
+  anchorAbility: 0
+  eagleAbility: 0
+  gobletAbility: 0
+  isSnowflake: 0
 --- !u!120 &2135039492
 LineRenderer:
   serializedVersion: 2
@@ -8784,7 +8810,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!64 &2135039494
 MeshCollider:
   m_ObjectHideFlags: 0

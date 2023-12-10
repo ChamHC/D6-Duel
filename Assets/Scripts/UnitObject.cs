@@ -4,15 +4,22 @@ using UnityEngine;
 
 public class UnitObject : MonoBehaviour
 {
-    public GameController turnController;
+    public GameController gameController;
     public PowerUps playerAbility;
     public PowerUps opponentAbility;
     [ReadOnly] public bool isAimed;
-    [ReadOnly] public int diceValue;
+    [ReadOnly] public float diceValue;
     [ReadOnly] public Vector3 startPosition;
     [ReadOnly] public Vector3 endPosition;
     [ReadOnly] public Vector3 launchDirection;
     [ReadOnly] public float timer;
+    [ReadOnly] public bool sunAbility;
+    [ReadOnly] public bool crossAbility;
+    [ReadOnly] public bool crownAbility;
+    [ReadOnly] public bool anchorAbility;
+    [ReadOnly] public bool eagleAbility;
+    [ReadOnly] public bool gobletAbility;
+    [ReadOnly] public bool isSnowflake;
 
     private void Start()
     {
@@ -28,6 +35,25 @@ public class UnitObject : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        //Sun Ability
+        if (sunAbility && GetComponent<Rigidbody>().velocity.y < -0.1f)
+        {
+            float explosionRadius = transform.localScale.x / 50.0f * 2.0f;
+            Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
+            foreach (Collider collider in colliders)
+            {
+                Rigidbody rigidbody = collider.GetComponent<Rigidbody>();
+                if (rigidbody && !rigidbody.isKinematic)
+                {
+                    Vector3 direction = rigidbody.position - transform.position;
+                    float distance = direction.magnitude;
+
+                    float forceMultiplier = Mathf.Clamp(distance / explosionRadius, 0f, 1f);
+                    rigidbody.AddForce(direction.normalized * forceMultiplier * 10f, ForceMode.Impulse);
+                }
+            }
+        }
+
         if (gameObject.tag == "Player")
         {
             if (collision.gameObject.tag == "Opponent")
@@ -38,15 +64,25 @@ public class UnitObject : MonoBehaviour
                     //Debug.Log("Contact Normal: " + contact.normal);
                     if (transform.position.y > contact.point.y && contact.normal.y >= 0.8f && contact.normal.y <= 1.0f) // Player Eliminating Enemy
                     {
-                        Debug.Log("Player eliminated Opponent");
-                        collision.gameObject.SetActive(false);
-                        turnController.Setup();
+                        if (collision.gameObject.GetComponent<UnitObject>().crownAbility) //Crown Ability
+                        {
+                            Vector3 direction = gameObject.transform.position - collision.transform.position;
+                            gameObject.GetComponent<Rigidbody>().AddForce(direction.normalized * 10.0f, ForceMode.Impulse);
+                            collision.gameObject.GetComponent<UnitObject>().crownAbility = false;
+                            return;
+                        }
+                        else
+                        {
+                            Debug.Log("Player eliminated Opponent");
+                            collision.gameObject.SetActive(false);
+                            gameController.Setup();
+                        }
                     }
                 }
             }
             else if (collision.gameObject.tag == "PowerUps")
             {
-                playerAbility.ObtainPowerups();
+                playerAbility.ObtainPowerups(gameObject);
             }
         }
         else if (gameObject.tag == "Opponent")
@@ -59,15 +95,25 @@ public class UnitObject : MonoBehaviour
                     //Debug.Log("Contact Normal: " + contact.normal);
                     if (transform.position.y > contact.point.y && contact.normal.y >= 0.8f && contact.normal.y <= 1.0f) // Enemy Eliminating Player
                     {
-                        Debug.Log("Opponent eliminated Player");
-                        collision.gameObject.SetActive(false);
-                        turnController.Setup();
+                        if (collision.gameObject.GetComponent<UnitObject>().crownAbility) //Crown Ability
+                        {
+                            Vector3 direction = gameObject.transform.position - collision.transform.position;
+                            gameObject.GetComponent<Rigidbody>().AddForce(direction.normalized * 10.0f, ForceMode.Impulse);
+                            collision.gameObject.GetComponent<UnitObject>().crownAbility = false;
+                            return;
+                        }
+                        else
+                        {
+                            Debug.Log("Opponent eliminated Player");
+                            collision.gameObject.SetActive(false);
+                            gameController.Setup();
+                        }
                     }
                 }
             }
             else if (collision.gameObject.tag == "PowerUps")
             {
-                opponentAbility.ObtainPowerups();
+                opponentAbility.ObtainPowerups(gameObject);
             }
         }
     }
