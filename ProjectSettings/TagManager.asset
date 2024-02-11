@@ -4,8 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Opponent
   - PowerUps
+  - PlayerA
+  - PlayerB
   layers:
   - Default
   - TransparentFX
