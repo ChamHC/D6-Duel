@@ -169,7 +169,7 @@ public class Dice : MonoBehaviour
             LineRenderer.SetPosition(0, transform.position);
 
             float distance = Vector3.Distance(StartPosition, EndPosition);
-            float normalizedDistance = Mathf.Clamp01(distance / 100.0f);
+            float normalizedDistance = Mathf.Clamp01(distance / 300.0f);
             LaunchDistance = normalizedDistance * 6f;
 
             if (LaunchDistance > DiceValue) LaunchDistance = DiceValue;

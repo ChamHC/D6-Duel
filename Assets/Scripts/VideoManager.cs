@@ -7,77 +7,87 @@ using UnityEngine.Video;
 
 public class VideoManager : MonoBehaviour
 {
-    public VideoClip LaunchTutorial;
-    public VideoClip EliminateTutorial;
-    public VideoClip BoostTutorial;
-    public VideoClip TeamBoostTutorial;
+    [ReadOnly] public string LaunchTutorial;
+    [ReadOnly] public string EliminateTutorial;
+    [ReadOnly] public string BoostTutorial;
+    [ReadOnly] public string TeamBoostTutorial;
 
     public VideoPlayer VideoPlayer;
 
     public TextMeshProUGUI DescriptionText;
 
-    public void Update()
+    private void Start()
+    {
+        LaunchTutorial = Application.streamingAssetsPath + "/LaunchTutorial.mp4";
+        EliminateTutorial = Application.streamingAssetsPath + "/EliminateTutorial.mp4";
+        BoostTutorial = Application.streamingAssetsPath + "/BoostTutorial.mp4";
+        TeamBoostTutorial = Application.streamingAssetsPath + "/TeamBoostTutorial.mp4";
+
+        VideoPlayer.url = LaunchTutorial;
+    }
+
+    private void Update()
     {
         Description();
     }
 
     public void Next()
     {
-        if (VideoPlayer.clip == LaunchTutorial)
+        if (VideoPlayer.url == LaunchTutorial)
         {
-            VideoPlayer.clip = EliminateTutorial;
+            VideoPlayer.url = EliminateTutorial;
         }
-        else if (VideoPlayer.clip == EliminateTutorial)
+        else if (VideoPlayer.url == EliminateTutorial)
         {
-            VideoPlayer.clip = BoostTutorial;
+            VideoPlayer.url = BoostTutorial;
         }
-        else if (VideoPlayer.clip == BoostTutorial)
+        else if (VideoPlayer.url == BoostTutorial)
         {
-            VideoPlayer.clip = TeamBoostTutorial;
+            VideoPlayer.url = TeamBoostTutorial;
         }
-        else if (VideoPlayer.clip == TeamBoostTutorial)
+        else if (VideoPlayer.url == TeamBoostTutorial)
         {
-            VideoPlayer.clip = LaunchTutorial;
+            VideoPlayer.url = LaunchTutorial;
         }
     }
 
     public void Previous()
     {
-        if (VideoPlayer.clip == LaunchTutorial)
+        if (VideoPlayer.url == LaunchTutorial)
         {
-            VideoPlayer.clip = TeamBoostTutorial;
+            VideoPlayer.url = TeamBoostTutorial;
         }
-        else if (VideoPlayer.clip == EliminateTutorial)
+        else if (VideoPlayer.url == EliminateTutorial)
         {
-            VideoPlayer.clip = LaunchTutorial;
+            VideoPlayer.url = LaunchTutorial;
         }
-        else if (VideoPlayer.clip == BoostTutorial)
+        else if (VideoPlayer.url == BoostTutorial)
         {
-            VideoPlayer.clip = EliminateTutorial;
+            VideoPlayer.url = EliminateTutorial;
         }
-        else if (VideoPlayer.clip == TeamBoostTutorial)
+        else if (VideoPlayer.url == TeamBoostTutorial)
         {
-            VideoPlayer.clip = BoostTutorial;
+            VideoPlayer.url = BoostTutorial;
         }
     }
 
     public void Description()
     {
-        if (VideoPlayer.clip == LaunchTutorial)
+        if (VideoPlayer.url == LaunchTutorial)
         {
             DescriptionText.text = "Drag over dice to launch. Dice value decides maximum launch distance";
         }
-        else if (VideoPlayer.clip == EliminateTutorial)
+        else if (VideoPlayer.url == EliminateTutorial)
         {
-            DescriptionText.text = "Stack to eliminate opponent's dice. Dice gain momentum on elimination.";
+            DescriptionText.text = "Land on opponent's dice to eliminate it. Dice gain momentum on elimination.";
         }
-        else if (VideoPlayer.clip == BoostTutorial)
+        else if (VideoPlayer.url == BoostTutorial)
         {
-            DescriptionText.text = "Alternatively, gain momentum by colliding with yellow dice.";
+            DescriptionText.text = "Alternatively, colliding with booster dice will also boost dice momentum.";
         }
-        else if (VideoPlayer.clip == TeamBoostTutorial)
+        else if (VideoPlayer.url == TeamBoostTutorial)
         {
-            DescriptionText.text = "Stacking on teammates' dice also boost momentum.";
+            DescriptionText.text = "Landing on teammates' dice also boost momentum.";
         }
     }
 }

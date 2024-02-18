@@ -622,6 +622,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundSlider: {fileID: 1572151166}
   musicSlider: {fileID: 1686244238}
+  uiSound: {fileID: 0}
+  bgMusic: {fileID: 0}
 --- !u!114 &240346323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1952,7 +1954,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -341, y: 743}
+  m_AnchoredPosition: {x: -341, y: 576}
   m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &661009700
@@ -6985,7 +6987,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 27a3f3103f6399c479ef2a48fdc4394f, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 0b16688ae61be1d4888ed1a1b4010595, type: 2}
+      objectReference: {fileID: 2100000, guid: 1e4173d0bc0e0944fb8316bf90420e0c, type: 2}
     - target: {fileID: 919132149155446097, guid: 27a3f3103f6399c479ef2a48fdc4394f, type: 3}
       propertyPath: m_Name
       value: PlayerB
@@ -7210,7 +7212,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: -0.05078125, y: -0.8, z: 9.6, w: 10.400001}
+  m_BoundingSphereOverride: {x: 1.02e-43, y: 4.5e-44, z: 8.42e-42, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -8624,7 +8626,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -680}
+  m_AnchoredPosition: {x: 0, y: -750}
   m_SizeDelta: {x: 160, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1309086512
@@ -9179,7 +9181,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 27a3f3103f6399c479ef2a48fdc4394f, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 1e4173d0bc0e0944fb8316bf90420e0c, type: 2}
+      objectReference: {fileID: 2100000, guid: 0b16688ae61be1d4888ed1a1b4010595, type: 2}
     - target: {fileID: 919132149155446097, guid: 27a3f3103f6399c479ef2a48fdc4394f, type: 3}
       propertyPath: m_Name
       value: PlayerA
@@ -10525,7 +10527,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -680}
+  m_AnchoredPosition: {x: 0, y: -750}
   m_SizeDelta: {x: 160, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1811120431
@@ -10657,7 +10659,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 242}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1910117046
